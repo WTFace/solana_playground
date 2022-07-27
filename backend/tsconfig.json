@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "isolatedModules": true,
+        "useDefineForClassFields": true,
+        "strictNullChecks": true,
+        "rootDir": "./src",
+        "esModuleInterop": true, 
+        "lib": [
+            "ESNext"
+        ],
+        "types": [
+            "node"
+        ]
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts"
+    ]
+}
