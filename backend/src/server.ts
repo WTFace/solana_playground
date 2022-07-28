@@ -45,8 +45,8 @@ app.get('/', async (req, res) => {
 });
 
 app.post('/mint', async (req, res) => {
-    const {key} = req.body;
-    const secret = new Uint8Array(Object.values(key._keypair.secretKey))
+    const { key } = req.body;
+    const secret = new Uint8Array(Object.values(key._keypair.secretKey));
     const pubKey = new PublicKey(key.address);
 
     const sign = {
@@ -66,7 +66,7 @@ app.post('/mint', async (req, res) => {
 });
 
 app.post('/get-token-account', async (req, res) => {
-    const {key, mint} = req.body;
+    const { key, mint } = req.body;
     const pubKey = new PublicKey(key.address);
     const secret = new Uint8Array(Object.values(key._keypair.secretKey));
 
@@ -83,7 +83,7 @@ app.post('/get-token-account', async (req, res) => {
 });
 
 app.post('/mint-to', async (req, res) => {
-    const {key, mint,tokenAccountAddr, amount} = req.body;
+    const { key, mint, tokenAccountAddr, amount } = req.body;
     const pubKey = new PublicKey(key.address);
     const secret = new Uint8Array(Object.values(key._keypair.secretKey));
     const sign = {
@@ -109,7 +109,7 @@ app.post('/mint-to', async (req, res) => {
 });
 
 app.post('/transfer', async (req, res) => {
-    const {key,fromTokenAcc, toTokenAcc, amount} = req.body;
+    const { key, fromTokenAcc, toTokenAcc, amount } = req.body;
     const pubKey = new PublicKey(key.address);
     const secret = new Uint8Array(Object.values(key._keypair.secretKey));
     const sign = {
@@ -127,12 +127,17 @@ app.post('/transfer', async (req, res) => {
         amount
     );
     console.log(signiture);
-    const fromTokenAccInfo = await getAccount(connection, new PublicKey(fromTokenAcc.address));
-    const toTokenAccInfo = await getAccount(connection, new PublicKey(toTokenAcc.address));
+    const fromTokenAccInfo = await getAccount(
+        connection,
+        new PublicKey(fromTokenAcc.address)
+    );
+    const toTokenAccInfo = await getAccount(
+        connection,
+        new PublicKey(toTokenAcc.address)
+    );
 
-    res.json({fromTokenAccInfo, toTokenAccInfo});
+    res.json({ fromTokenAccInfo, toTokenAccInfo });
 });
-
 
 app.listen(3001, async function () {
     const airdropSignature = await connection.requestAirdrop(
@@ -140,38 +145,6 @@ app.listen(3001, async function () {
         // friend.publicKey,
         LAMPORTS_PER_SOL
     );
-    await connection.confirmTransaction(airdropSignature);
-    console.log(`starting app on: 3001`);
-    const mint = await createMint(
-  connection,
-  payer,
-  mintAuthority.publicKey,
-  freezeAuthority.publicKey,
-  9 // We are using 9 to match the CLI decimal default exactly
-);
-
-    const tokenAccount = await getOrCreateAssociatedTokenAccount(
-  connection,
-  payer,
-  mint,
-  payer.publicKey
-)
-
-await mintTo(
-  connection,
-  payer,
-  mint,
-  tokenAccount.address,
-  mintAuthority,
-  100000000000 // because decimals for the mint are set to 9 
-)
-
-const mintInfo = await getMint(
-  connection,
-  mint
-)
-console.log(mintInfo.supply);
-// 100
 });
 
 export default app;
