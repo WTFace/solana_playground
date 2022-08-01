@@ -72,7 +72,7 @@ function App() {
       }
     }).then(res => {
       console.log(res.data)
-      //setMint(res.data.mintInfo);
+      setMint(res.data.mintInfo);
       setTokenAccount(res.data.tokenAccountInfo)
     })
   }

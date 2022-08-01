@@ -132,7 +132,7 @@ app.post('/burn', async (req, res) => {
         connection,
         new PublicKey(tokenAccountAddr)
     );
-    res.json({ tokenAccountInfo });
+    res.json({ mintInfo, tokenAccountInfo });
 });
 
 app.post('/transfer', async (req, res) => {
@@ -162,7 +162,8 @@ app.post('/transfer', async (req, res) => {
         connection,
         new PublicKey(toTokenAcc.address)
     );
-
+    
+    const mintInfo = await getMint(connection, new PublicKey(fromTokenAcc.mint));
     res.json({ fromTokenAccInfo, toTokenAccInfo });
 });
 
