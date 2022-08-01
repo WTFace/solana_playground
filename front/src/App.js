@@ -9,6 +9,8 @@ function App() {
   const [tokenAccount, setTokenAccount] = useState({});
   const [mintAmount, setMintAmount] = useState(0);
   const [transferAmount, setTransferAmountMintAmount] = useState(0);
+  const [burnAmount, setBurnAmount] = useState(0);
+
   
   const [friendKey, setFriendKey] = useState({});
   const [friendTokenAcc, setFriendTokenAcc] = useState({});
@@ -57,6 +59,24 @@ function App() {
       setTokenAccount(res.data.tokenAccountInfo)
     })
   }
+
+  const burn = (key, mint, tokenAccount) => {
+    axios({
+      method: 'post',
+      url: 'http://localhost:3001/burn',
+      data: {
+        key,
+        mint,
+        tokenAccountAddr: tokenAccount.address,
+        amount: burnAmount
+      }
+    }).then(res => {
+      console.log(res.data)
+      //setMint(res.data.mintInfo);
+      setTokenAccount(res.data.tokenAccountInfo)
+    })
+  }
+
   const transfer = (key, tokenAccount, friendTokenAcc) => {
     axios({
       method: 'post',
@@ -95,6 +115,11 @@ function App() {
         <div className="my-2"></div>
         <input type="number" value={transferAmount} min={0} onChange={(e) => setTransferAmountMintAmount(e.target.value)}/>
           <button className='rounded bg-blue-400 px-2 mx-2' onClick={() => transfer(myKey, tokenAccount, friendTokenAcc, transferAmount)}>transfer</button>
+  
+        <div className="my-2"></div> 
+        <input type="number" value={burnAmount} min={0} onChange={(e) => setBurnAmount(e.target.value)}/>
+          <button className='rounded bg-blue-400 px-2 mx-2' onClick={() => burn(myKey, mint, tokenAccount, burnAmount)}>burn</button>
+
       </div>
 
       <div className='text-left my-4 w-1/2 p-4'>
@@ -104,6 +129,7 @@ function App() {
         <ul>
           {Object.keys(friendTokenAcc).map(prop => <li className={prop === 'mint' ?'text-rose-600' : ''}>{prop}: {friendTokenAcc[prop]}</li>)}
         </ul>
+        
       </div>
     </div>
   );

@@ -18,6 +18,7 @@ import {
     getOrCreateAssociatedTokenAccount,
     getAccount,
     transfer,
+    burn,
 } from '@solana/spl-token';
 
 const cors = require('cors');
@@ -106,6 +107,32 @@ app.post('/mint-to', async (req, res) => {
         new PublicKey(tokenAccountAddr)
     );
     res.json({ mintInfo, tokenAccountInfo });
+});
+
+app.post('/burn', async (req, res) => {
+    const {key, mint,tokenAccountAddr, amount} = req.body;
+    const pubKey = new PublicKey(key.address);
+    const secret = new Uint8Array(Object.values(key._keypair.secretKey));
+    const sign = {
+        publicKey: pubKey,
+        secretKey: secret,
+    };
+
+    await burn(
+        connection, //connection to use
+        sign,       //payer of the transaction fees
+        new PublicKey(tokenAccountAddr), //account to burn tokens from
+        new PublicKey(mint.address), //mint for the account
+        pubKey,
+        Number(amount)
+    );
+
+    const mintInfo = await getMint(connection, new PublicKey(mint.address));
+    const tokenAccountInfo = await getAccount(
+        connection,
+        new PublicKey(tokenAccountAddr)
+    );
+    res.json({ tokenAccountInfo });
 });
 
 app.post('/transfer', async (req, res) => {
