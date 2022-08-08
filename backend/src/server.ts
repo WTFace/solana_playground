@@ -169,6 +169,51 @@ app.post('/transfer', async (req, res) => {
     res.json({ fromTokenAccInfo, toTokenAccInfo });
 });
 
+app.post('/swap', async (req, res) => {
+    const { key, poolKey, mySource, myDest, poolSource, poolDest, tokenIn, amount } = req.body;
+
+    // I transfer token A to the pool
+    let pubKey = new PublicKey(key.address);
+    let secret = new Uint8Array(Object.values(key._keypair.secretKey));
+    let sign = {
+        publicKey: pubKey,
+        secretKey: secret,
+    };
+    const signiture = await transfer(
+        connection,
+        sign,
+        new PublicKey(mySource.address),
+        new PublicKey(poolSource.address),
+        pubKey,
+        amount
+    );
+    const mySourceInfo = await getAccount(connection, new PublicKey(mySource.address));
+    const poolSourceInfo = await getAccount(connection, new PublicKey(poolSource.address));
+    console.log(mySourceInfo.amount, poolSourceInfo.amount)
+
+    // pool transfer token B to me
+    pubKey = new PublicKey(poolKey.address);
+    secret = new Uint8Array(Object.values(poolKey._keypair.secretKey));
+    sign = {
+        publicKey: pubKey,
+        secretKey: secret,
+    };
+    const signiture2 = await transfer(
+        connection,
+        sign,
+        new PublicKey(poolDest.address),
+        new PublicKey(myDest.address),
+        pubKey,
+        amount
+    );
+    
+    const myDestInfo = await getAccount(connection, new PublicKey(myDest.address));
+    const poolDestInfo = await getAccount(connection, new PublicKey(poolDest.address));
+    const sourceMint = await getMint(connection, new PublicKey(tokenIn.address));
+    const destMint = await getMint(connection, new PublicKey(myDest.mint));
+    res.json({mySourceInfo, myDestInfo, poolSourceInfo, poolDestInfo, sourceMint, destMint});
+});
+
 app.listen(3001, async function () {
     const airdropSignature = await connection.requestAirdrop(
         payer.publicKey,
