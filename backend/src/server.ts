@@ -27,7 +27,9 @@ const app: express.Application = express();
 const payer = Keypair.generate();
 const mintAuthority = Keypair.generate();
 const freezeAuthority = Keypair.generate();
-const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+const url = 'http://localhost:8899';
+const connection = new Connection(url, 'recent');
+// const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
 const friend = Keypair.generate();
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,9 +41,9 @@ app.use(
 );
 
 app.get('/', async (req, res) => {
-    // console.log(payer)
     const myKey = { ...payer, address: payer.publicKey };
     const friendKey = { ...friend, address: friend.publicKey };
+
     res.json({ myKey, friendKey });
 });
 
@@ -173,6 +175,13 @@ app.listen(3001, async function () {
         // friend.publicKey,
         LAMPORTS_PER_SOL
     );
+    await connection.requestAirdrop(
+        // payer.publicKey,
+        friend.publicKey,
+        LAMPORTS_PER_SOL
+    );
+    
+    console.log('listening to port 3001');
 });
 
 export default app;
